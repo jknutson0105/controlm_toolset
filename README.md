@@ -5,3 +5,7 @@
   - Parameters: Version (default=9) Release (default=20) Fixpack (no default)
   - Use: ./aapi_upgrade.ps1 -fixpack 225
   
+## sndSMSviaATT.sh
+  - Purpose: as a control-M Shout, sends an SMS message via a REST request
+  - Parameters: standard shout parameters $2 is used as message and contains the phone and text message separated by "=="
+  - Use: as part of a Control-M shout to program
