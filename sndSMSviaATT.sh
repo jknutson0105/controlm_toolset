@@ -61,11 +61,13 @@ FQDN="https://api.att.com"
 
 # Authentication parameter.
 
+LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+
 token=`curl "${FQDN}/oauth/v4/token" \
     --insecure \
     --header "Accept: application/json" \
     --header "Content-Type: application/x-www-form-urlencoded" \
-    --data "client_id=${APP_KEY}&client_secret=${APP_SECRET}&grant_type=client_c                  redentials&scope=${API_SCOPES}"`
+    --data "client_id=${APP_KEY}&client_secret=${APP_SECRET}&grant_type=client_credentials&scope=${API_SCOPES}"`
 
 
 OAUTH_ACCESS_TOKEN=`jq -r .access_token <<<$token`
@@ -75,12 +77,12 @@ echo "Token obtained: $OAUTH_ACCESS_TOKEN"
 # Enter telephone number to which the SMS message will be sent.
 # For example: TEL="tel:+1234567890"
 #TEL="tel:+15104243921"
-TEL=`echo $2|awk '{print $1}'`
+TEL=`echo $2|awk -F "==" '{print $1}'|sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'`
 TEL="tel:+1$TEL"
 #echo "addr: $TEL"  >> $outdir/outfile.txt
 
 # SMS message text body.
-SMS_MSG_TEXT=`echo $2|awk -F\" '{print $2}'`
+SMS_MSG_TEXT=`echo $2|awk -F "==" '{print $2}'|sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'`
 SMS_MSG_TEXT="$SMS_MSG_TEXT"
 #echo "msg: $SMS_MSG_TEXT"  >> $outdir/outfile.txt
 
@@ -91,6 +93,6 @@ curl "${FQDN}/sms/v3/messaging/outbox" \
     --header "Accept: application/json" \
     --header "Content-Type: application/json" \
     --header "Authorization: Bearer ${OAUTH_ACCESS_TOKEN}" \
-    --data "{\"outboundSMSRequest\":{\"address\":\"${TEL}\",\"message\":\"${SMS_                  MSG_TEXT}\"}}" \
+    --data "{\"outboundSMSRequest\":{\"address\":\"${TEL}\",\"message\":\"${SMS_MSG_TEXT}\"}}" \
     --request POST
 #    --request POST >> $outdir/outfile.txt 2>&1
